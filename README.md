@@ -1,7 +1,6 @@
 # Rationale erzeugende Funktion – der Nenner verrät es – Streamlit-Demo
 
-<!-- TODO nach dem Deploy: direkt hierher den Live-Link setzen (Leerzeile davor und danach):
-**[→ Demo live ausprobieren](https://sebastianhanisch-rationale-ef-demo.streamlit.app/)** -->
+**[→ Demo live ausprobieren](https://sebastianhanisch-rationale-ef-demo.streamlit.app/)**
 
 Stück 2 von 16 der Reihe **„Abzählen und erzeugende Funktionen“** in der „Konzepte“-Reihe für die Website „Sebastian Hanisch – Operations Research und Machine Learning“ (die Linie wird erst vollständig veröffentlicht). Vorgänger ist `aufzaehlen-rekursion-demo` (Stück 1): Dort zählt die Rekursion über einen Zustand Folgen mit verbotenen Teilfolgen. Diese Demo fasst dieselben Zahlen a(0), a(1), … zur **erzeugenden Funktion** zusammen und zeigt, dass sie ein **Bruch aus zwei Polynomen** ist, dessen Nenner man ohne Zählen ausrechnet. Dieselben Regler und Presets wie in Stück 1 (Alphabet, verbotene Teilfolgen, Länge), dazu ein Bild der Eigenwerte in der komplexen Ebene. Kante zu Stück 1: Raten zeigt kein Wachstum und keinen Grund für den Anlauf. Schichtfolgen sind nur der Rahmen: Dienstplanung ist ein Optimierungsproblem, hier wird nur gezählt.
 
@@ -123,4 +122,4 @@ Gebaut mit Streamlit, Plotly und fpdf2.
 
 ---
 
-Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – Operations Research und Machine Learning ([Über mich](https://sebastianhanisch.net/ueber-mich.html)). Mehr zu den Demos: [Interaktive Demos](https://sebastianhanisch.net/demos.html).
+Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – Operations Research und Machine Learning ([Über mich](https://sebastianhanisch.net/ueber-mich.html)). Mehr zur Reihe: [Abzählen: von der Rekursion zur Verfahrenswahl](https://sebastianhanisch.net/konzepte-abzaehlen.html).
