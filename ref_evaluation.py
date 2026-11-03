@@ -40,7 +40,7 @@ def analyse(settings: Settings) -> Analysis:
     problems = A.check_rational(auto, rat)
     res = A.residual(rat.qr, growth.roots)
     if res > C.RESIDUAL_WARN:
-        problems.append(f"Die Eigenwerte sind ungenau (Rest {res:.1e}); Bild und Wachstumsangaben mit Vorsicht lesen; bei mehrfachen Nullstellen können Klasse, Kennzahl und Stellenzahl falsch sein")
+        problems.append(f"Die Eigenwerte sind ungenau (Rest {res:.1e}); Bild und Wachstumsangaben mit Vorsicht lesen; dicht beieinanderliegende Nullstellen können Klasse, Kennzahl und Stellenzahl verfälschen")
     return Analysis(settings, rules, parse_problems, auto, rat, growth, seq, problems)
 
 

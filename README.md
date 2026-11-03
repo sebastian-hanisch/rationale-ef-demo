@@ -19,7 +19,7 @@ Was verrät der Bruch P(z) / Q(z) über die Zählfolge? Der Nenner Q(z) = det(I 
 
 ## Modell
 
-Wie in Stück 1: Alphabet, bis zu sechs Verbote von je höchstens sechs Zeichen, `a(n)` = Zahl der Wörter der Länge n ohne Verbot. Der Automat hat die Zustände (längstes Ende des Wortes, das ein echter Anfang eines Verbots ist); `M[i][j]` zählt die Zeichen von Zustand i nach Zustand j. Dann gilt A(z) = Σ a(n) zⁿ = e₀ᵀ (I − zM)⁻¹ **1** = P(z)/Q(z) mit Q(z) = det(I − zM), berechnet nach Faddeev–LeVerrier mit ganzen Zahlen (`q_polynomial`); P ist Q·A, abgeschnitten, danach mit Brüchen gekürzt (`rational_form`). Die Eigenwerte (Nullstellen von λ^d · Q(1/λ)) bestimmt Durand–Kerner in `complex` (`dk_roots`); sie dienen nur der Anzeige und den Vorhersagen. Die Formeln stehen im 📐-Expander der App.
+Wie in Stück 1: Alphabet, bis zu sechs Verbote von je höchstens sechs Zeichen, `a(n)` = Zahl der Wörter der Länge n ohne Verbot. Der Automat hat die Zustände (längstes Ende des Wortes, das ein echter Anfang eines Verbots ist); `M[i][j]` zählt die Zeichen von Zustand i nach Zustand j. Dann gilt A(z) = Σ a(n) zⁿ = e₀ᵀ (I − zM)⁻¹ **1** = P(z)/Q(z) mit Q(z) = det(I − zM), berechnet nach Faddeev–LeVerrier mit ganzen Zahlen (`q_polynomial`); P ist Q·A, abgeschnitten, danach mit Brüchen gekürzt (`rational_form`). Die Eigenwerte (Nullstellen von λ^d · Q(1/λ)) bestimmt `dk_roots`: Das Polynom wird zuerst exakt mit Brüchen nach Vielfachheit in quadratfreie Teile zerlegt (`squarefree_parts`, Yun), dann sucht Durand–Kerner in `complex` die einfachen Nullstellen jedes Teils; sie dienen nur der Anzeige und den Vorhersagen. Die Formeln stehen im 📐-Expander der App.
 
 ## Methodik
 
@@ -44,7 +44,7 @@ Jede Zahl steht in `tests/test_claims.py`, `tests/test_verdicts.py`, `tests/test
 | Wachstumsklassen, 300 Sätze (Seeds ab 10 000) | exponentiell 201, polynomiell 86, endlich 13; aus den Eigenwerten und aus der Folge **300 von 300** gleich; 5 Sätze mit mehreren Eigenwerten vom größten Betrag; der Quotient schwingt in 0 |
 | Wachstumsklassen, 1000 Sätze (Phase 0) | 673 exponentiell, 283 polynomiell, 44 endlich, 1000 von 1000 gleich; 51 Sätze mit mehreren größten Eigenwerten, der Quotient schwingt in 1 |
 | Stellenzahl vorhersagen | richtig in **43 von 43** exponentiellen Sätzen bei n = 1000 und n = 10 000. Standard: log₁₀ c = 0,0838468990, vorhergesagt und gezählt 407 und 4061 Stellen; ohne Verbote 478 und 4772. Die Konstante c kommt aus dem gezählten a(200). In 1342 weiteren exponentiellen Zufallssätzen (Seeds ab 70 000, unabhängige Nachprüfung) stimmte die Vorhersage in 1339; die 3 Ausfälle: 2 Fehler der Nullstellensuche, 1 Satz mit doppeltem größtem Eigenwert (2093 statt 2094 Stellen) |
-| Nullstellensuche | größter relativer Rest unter 10⁻¹² über 300 Sätze (Phase 0: 1,2·10⁻¹⁵); bei dreifacher Nullstelle λ = 1 (Q = (1 − z)³) scheitert Durand–Kerner, siehe Grenzen |
+| Nullstellensuche | größter relativer Rest unter 10⁻¹² über 300 Sätze (Phase 0: 1,2·10⁻¹⁵); bei dreifacher Nullstelle λ = 1 (Q = (1 − z)³) liefert die Zerlegung nach Vielfachheit λ = 1, 1, 1 und die Klasse polynomiell, siehe Grenzen |
 | Kürzen | Beispiel (A, B, C; CA, BBB, AC): Q = 1 − 2z − z² + 2z⁴ und P = 1 + z − z³ − z⁴ haben den Faktor 1 + z gemeinsam; gekürzt Grad 3 und 3 (fünf Zustände) |
 | Presets | Zustandszahlen 3, 2, 5, 11, 2, 3; Klassen: Polynomielles Wachstum ist polynomiell (Q = (1 − z)²), Endliche Folge endlich (Q = 1, P = 1 + 2z) |
 
@@ -52,7 +52,7 @@ Jede Zahl steht in `tests/test_claims.py`, `tests/test_verdicts.py`, `tests/test
 
 - **Die Matrixmethode setzt einen endlichen Automaten voraus.** Verschachtelte Strukturen (Klammern, Bäume) ergeben keinen Bruch aus Polynomen (Catalan-Zahlen): Stück 3. Ein Regelwerk ohne endlichen Automaten kann eine rationale Zählfolge haben (etwa aⁿbⁿ mit 1/(1 − z²)); die Demo behandelt es nicht.
 - **Wachstum nur aus dem größten Eigenwert.** Mehrere Eigenwerte gleichen Betrags können den Quotienten schwingen lassen (in 1 von 1000 Zufallssätzen beobachtet, kein exponentieller Fall darunter), mehrfache bringen einen polynomiellen Faktor; die Demo liest nur die Klasse, nicht den Grad des Polynoms (Stück 9).
-- **Nullstellen sind Näherungen** (Durand–Kerner). Mehrfachnullstellen konvergieren langsamer oder gar nicht: Bei der dreifachen Nullstelle λ = 1 (Q = (1 − z)³, etwa Verbote ABAA und ABB über A, B) scheitert das Verfahren. In 6000 Zufallssätzen traten 9 solche Fälle auf; beim Vergleich der Klassen blieben deshalb in 3000 weiteren Sätzen 2997 von 3000 gleich. Die App warnt „Eigenwerte ungenau“, zeigt aber trotzdem eine falsche Klasse „exponentiell“, einen falschen größten Eigenwert (etwa 1,41 statt 1) und eine falsche Stellenzahl (124 statt 6 bei n = 1000). Das ist ein bekannter Fehler der Demo, nicht behoben. Die ursprüngliche Prüfung an 1300 Zufallssätzen hat diese Fälle nicht erfasst, gezielt konstruierte Fälle fehlten.
+- **Nullstellen sind Näherungen** (Durand–Kerner in `complex`). Durand–Kerner allein scheiterte an mehrfachen Nullstellen: Bei Q = (1 − z)³ (etwa Verbote ABAA und ABB über A, B) kam λ₁ = 1,41 und die Klasse „exponentiell“ heraus; in 6000 Zufallssätzen (Seeds 0 bis 5999) traten 12 solche Fälle auf, in 3000 weiteren (Seeds ab 50 000) 3. Behoben ist das durch die exakte Zerlegung nach Vielfachheit vor der Nullstellensuche (Test mit den 15 Seeds und mit mehrfachen Nullstellen bis Vielfachheit 4): λ = 1, 1, 1, Klasse polynomiell, Rest unter 10⁻⁹. Die App warnt weiterhin „Eigenwerte ungenau“, wenn der Rest über 10⁻⁶ liegt; das trat in diesen 9000 Zufallssätzen nach der Änderung nicht mehr auf, ist aber kein Beweis für beliebige Nenner. Die ursprüngliche Prüfung an 1300 Zufallssätzen hatte diese Fälle nicht erfasst, gezielt konstruierte Fälle fehlten.
 - **Die Klassen hängen an der Schwelle 0,03** für die Steigung von ln a(n) (n = 200 bis 400). Für kleine Automaten trennt sie sauber (1000 von 1000), das ist eine Beobachtung, kein Beweis.
 - **„Kleinste geratene Ordnung = max(Nennergrad, Zählergrad + 1)“** ist ein Messbefund an Zufallssätzen; die Ableitung aus Q·A = P liegt nahe, wird hier nicht bewiesen.
 - **Konvergenzradius der Spielwiese:** die Teilsumme nutzt 300 Glieder; nahe am Radius ist sie noch nicht eingeschwungen, die App sagt es.
@@ -68,7 +68,7 @@ Jede Zahl steht in `tests/test_claims.py`, `tests/test_verdicts.py`, `tests/test
 - **Browser:** frischer Vordergrund-Tab ohne Konsoleneinträge (Standard, Preset mit elf Zuständen, Experiment 5 per Klick); Achsenbereiche des Eigenwertbildes geprüft.
 - **Nicht gemacht:** Mutationstests (seit 2026-10-28 nicht mehr verlangt), Docker-Lauf der Linux-CI (Docker fehlt auf diesem Rechner; die CI nach dem Push entscheidet), Handy-Breite (Layout wie Stück 1, nicht erneut geprüft).
 
-381 Tests (`pytest tests`).
+405 Tests (`pytest tests`).
 
 ## Dateistruktur
 

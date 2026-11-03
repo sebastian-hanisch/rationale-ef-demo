@@ -8,6 +8,7 @@ unabhängige Prüfer (Gauß-Elimination mit Brüchen) für Q. Polynome sind List
 import math
 from dataclasses import dataclass
 from fractions import Fraction
+from itertools import zip_longest
 
 import ref_constants as C
 from ref_scenario import Rules
@@ -345,14 +346,37 @@ def check_rational(auto: Automaton, rat: Rational, n: int = C.CHECK_N, points=C.
 
 # ----------------------------------------------------------------------------- Eigenwerte und Wachstum
 
-def dk_roots(qr, iterations: int = C.ROOT_ITERATIONS, tol: float = C.ROOT_STEP_TOL) -> list[complex]:
-    """Eigenwerte λ: die Nullstellen des monischen Polynoms λ^d Q_r(1/λ) nach Durand–Kerner (d = Grad von Q_r). Die Pole von A(z) liegen bei z = 1/λ.
+def poly_derivative(p) -> list:
+    """Ableitung eines Polynoms (Koeffizienten aufsteigend)."""
+    return trim([i * c for i, c in enumerate(p)][1:])
 
-    Näherungen; Mehrfachnullstellen konvergieren langsamer oder gar nicht (dreifache Nullstelle bei 1: Verfahren scheitert). `residual` prüft das Ergebnis."""
-    d = len(qr) - 1
-    if d == 0:
+
+def squarefree_parts(p) -> list:
+    """Zerlegung nach Vielfachheit (Yun): [(k, s_k), ...] mit p = Π s_k^k; jedes s_k ist monisch, quadratfrei, und seine Nullstellen sind genau die k-fachen von p.
+
+    Rechnet exakt mit Brüchen, braucht also keine Toleranz, um mehrfache Nullstellen zu erkennen. Koeffizienten aufsteigend; p ≠ 0."""
+    p = [Fraction(c) for c in trim(p)]
+    if len(p) <= 1:
         return []
-    coeffs = [complex(c) for c in qr]
+    g = poly_gcd(p, poly_derivative(p))
+    b, _ = poly_divmod(p, g)
+    c, _ = poly_divmod(poly_derivative(p), g)
+    d = trim([x - y for x, y in zip_longest(c, poly_derivative(b), fillvalue=Fraction(0))])
+    parts, k = [], 1
+    while len(b) > 1:
+        a = poly_gcd(b, d) if d else b
+        if len(a) > 1:
+            parts.append((k, a))
+        b, _ = poly_divmod(b, a)
+        c, _ = poly_divmod(d, a) if d else ([], [])
+        d = trim([x - y for x, y in zip_longest(c, poly_derivative(b), fillvalue=Fraction(0))])
+        k += 1
+    return parts
+
+
+def _dk_simple(coeffs, iterations: int, tol: float) -> list[complex]:
+    """Durand–Kerner für ein monisches Polynom mit lauter einfachen Nullstellen (Koeffizienten absteigend, `coeffs[0]` = 1)."""
+    d = len(coeffs) - 1
 
     def f(x):
         v = 0j
@@ -375,6 +399,22 @@ def dk_roots(qr, iterations: int = C.ROOT_ITERATIONS, tol: float = C.ROOT_STEP_T
             delta = max(delta, abs(step))
         if delta < tol:
             break
+    return roots
+
+
+def dk_roots(qr, iterations: int = C.ROOT_ITERATIONS, tol: float = C.ROOT_STEP_TOL) -> list[complex]:
+    """Eigenwerte λ: die Nullstellen des monischen Polynoms λ^d Q_r(1/λ) (d = Grad von Q_r), jede so oft wie ihre Vielfachheit. Die Pole von A(z) liegen bei z = 1/λ.
+
+    Zuerst wird das Polynom exakt (mit Brüchen) in quadratfreie Teile nach Vielfachheit zerlegt (`squarefree_parts`), dann sucht Durand–Kerner die Nullstellen jedes Teils, wo es nur einfache gibt, und jede wird so oft aufgeführt wie ihre Vielfachheit. Das Ergebnis bleibt eine Näherung (Rundung in `complex`); `residual` prüft es."""
+    d = len(qr) - 1
+    if d == 0:
+        return []
+    lam_poly = [Fraction(c) for c in reversed(list(qr))]          # aufsteigend in λ
+    roots: list[complex] = []
+    for k, part in squarefree_parts(lam_poly):
+        found = _dk_simple([complex(c) for c in reversed(part)], iterations, tol)
+        for r in found:
+            roots.extend([r] * k)
     return roots
 
 

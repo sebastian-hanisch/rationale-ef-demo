@@ -100,3 +100,63 @@ def test_text_helpers():
     assert ev.recurrence_text([1, 0, -1]) == "a(n) = a(n−2)"
     assert ev.eigenvalue_text(complex(2.5468182769, 0)) == "2,5468"
     assert ev.eigenvalue_text(complex(-0.5, 0.25)) == "-0,5000 + 0,2500 i" and ev.eigenvalue_text(complex(1.0, -0.5)) == "1,0000 − 0,5000 i"
+
+
+# Regression: Durand–Kerner allein scheiterte bei mehrfachen Nullstellen (Q = (1 − z)³ ergab λ₁ = 1,41 und „exponentiell“).
+TRIPLE_ROOT_SEEDS = (187, 891, 1514, 1754, 3069, 3327, 3340, 3497, 4738, 4826, 5202, 5446, 50002, 50983, 51911)
+
+
+def test_triple_root_example_from_the_review_abab():
+    rules = Rules("AB", ("ABAA", "ABB"))
+    auto, rat = _rat(rules)
+    assert [int(c) for c in rat.qr] == [1, -3, 3, -1]                  # Q = (1 − z)³
+    g = A.classify(rat.qr)
+    assert g.kind == "polynomiell" and g.lam1 == pytest.approx(1.0, abs=1e-9) and g.dominant == 3
+    assert all(abs(r - 1) < 1e-9 for r in g.roots) and A.residual(rat.qr, g.roots) < 1e-9
+    analysis = ev.analyse(ev.Settings("A, B", "ABAA, ABB", 12))
+    assert analysis.problems == [] and analysis.growth.kind == "polynomiell"
+    assert A.classify_sequence(auto)[0] == "polynomiell"
+
+
+@pytest.mark.parametrize("seed", TRIPLE_ROOT_SEEDS)
+def test_triple_root_random_sets_are_classified_correctly(seed):
+    auto, rat = _rat(random_rules(seed))
+    assert [int(c) for c in rat.qr] == [1, -3, 3, -1]
+    g = A.classify(rat.qr)
+    assert g.kind == "polynomiell" and g.lam1 == pytest.approx(1.0, abs=1e-9) and len(g.roots) == 3
+    assert A.residual(rat.qr, g.roots) < 1e-9
+    assert A.classify_sequence(auto)[0] == g.kind
+
+
+def _from_roots(roots):
+    """Monisches Polynom (höchster Koeffizient zuerst) zu den gegebenen ganzzahligen Nullstellen mit Vielfachheit."""
+    p = [Fraction(1)]
+    for r in roots:
+        p = [a - r * b for a, b in zip(p + [Fraction(0)], [Fraction(0)] + p)]
+    return p
+
+
+@pytest.mark.parametrize("roots", [(1, 1, 1), (2, 2, -1), (2, 2, -1, -1, -1), (3, 3, 3, 3), (1, 1, 2, 2, 3), (-1, -1, -1, 1, 1, 5)])
+def test_dk_roots_with_multiple_roots_keep_their_multiplicity(roots):
+    got = A.dk_roots(_from_roots(roots))
+    assert len(got) == len(roots)
+    assert sorted(r.real for r in got) == pytest.approx(sorted(roots), abs=1e-9) and all(abs(r.imag) < 1e-9 for r in got)
+    assert A.residual(_from_roots(roots), got) < 1e-9
+
+
+def test_dk_roots_with_a_double_pair_of_complex_roots():
+    got = A.dk_roots([Fraction(c) for c in (1, 0, 2, 0, 1)])          # (λ² + 1)²
+    assert len(got) == 4 and sorted(got, key=lambda z: (z.imag, z.real)) == pytest.approx([-1j, -1j, 1j, 1j], abs=1e-9)
+
+
+def test_readme_triple_root_counts_and_no_residual_warning_in_9000_random_sets():
+    triple = []
+    for seed in (*range(6000), *range(50_000, 53_000)):
+        auto, rat = _rat(random_rules(seed))
+        g = A.classify(rat.qr)
+        assert A.residual(rat.qr, g.roots) <= C.RESIDUAL_WARN, seed
+        if [int(c) for c in rat.qr] == [1, -3, 3, -1]:
+            triple.append(seed)
+            assert g.kind == "polynomiell" and g.lam1 == pytest.approx(1.0, abs=1e-9)
+    assert triple == [s for s in TRIPLE_ROOT_SEEDS]
+    assert len([s for s in triple if s < 6000]) == 12 and len([s for s in triple if s >= 50_000]) == 3
