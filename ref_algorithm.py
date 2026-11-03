@@ -348,7 +348,7 @@ def check_rational(auto: Automaton, rat: Rational, n: int = C.CHECK_N, points=C.
 def dk_roots(qr, iterations: int = C.ROOT_ITERATIONS, tol: float = C.ROOT_STEP_TOL) -> list[complex]:
     """Eigenwerte λ: die Nullstellen des monischen Polynoms λ^d Q_r(1/λ) nach Durand–Kerner (d = Grad von Q_r). Die Pole von A(z) liegen bei z = 1/λ.
 
-    Näherungen; Mehrfachnullstellen konvergieren langsamer. `residual` prüft das Ergebnis."""
+    Näherungen; Mehrfachnullstellen konvergieren langsamer oder gar nicht (dreifache Nullstelle bei 1: Verfahren scheitert). `residual` prüft das Ergebnis."""
     d = len(qr) - 1
     if d == 0:
         return []

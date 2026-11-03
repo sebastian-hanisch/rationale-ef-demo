@@ -95,8 +95,8 @@ with st.container(key="kopf"):
 st.markdown(
     """
 **Was steckt in der Zählfolge?** In Stück 1 hat die Rekursion über einen **Zustand** die Folgen gezählt. Fasst man alle Zahlen a(0), a(1), a(2), … zu einer **erzeugenden Funktion** zusammen,
-ist sie ein **Bruch aus zwei Polynomen**: A(z) = P(z) / Q(z). Der **Nenner** Q(z) = det(I − zM) lässt sich aus der Übergangsmatrix M **ohne Zählen** ausrechnen und verrät die
-**Rekursion** (statt sie zu raten), den **Anlauf** (der Zähler), das **Wachstum** (der größte Eigenwert) und sogar die **Stellenzahl** weit entfernter Glieder.
+ist sie ein **Bruch aus zwei Polynomen**: A(z) = P(z) / Q(z). Der **Nenner** Q(z) = det(I − zM) lässt sich aus der Übergangsmatrix M **ohne Zählen** ausrechnen; den Zähler P gewinnt die App aus den ersten gezählten Gliedern. Zusammen verraten sie die
+**Rekursion** (statt sie zu raten), den **Anlauf** (der Zähler), das **Wachstum** (der größte Eigenwert) und sogar die **Stellenzahl** weit entfernter Glieder (die Konstante c kommt aus einem gezählten Glied).
 
 Weiter unten: **fünf Experimente** (**🔬**), eine **🎲 Spielwiese**, **🚧 Wo die Annahmen enden** und der Expander **📐 Mathematische Formulierung**.
 """
@@ -214,7 +214,7 @@ verdict(verdict_growth(growth_res))
 
 st.markdown("---")
 
-st.subheader("🔬 Experiment 4: Stellenzahl ohne Zählen")
+st.subheader("🔬 Experiment 4: Stellenzahl vorhersagen")
 st.caption(f"Aus λ₁ und der Konstanten c (aus a({C.DIGIT_REF_N})) wird die Stellenzahl von a(n) vorhergesagt: ⌊n·log₁₀ λ₁ + log₁₀ c⌋ + 1. Verglichen mit der gezählten Stellenzahl bei n = "
            f"{' und '.join(str(x) for x in C.DIGIT_SIZES)}.")
 digits_res = _digits(alphabet_key, patterns_key)
@@ -243,7 +243,8 @@ st.markdown("---")
 
 st.subheader("🎲 Spielwiese: Wie weit trägt die Reihe?")
 st.caption(f"Die Teilsumme der ersten {C.PROBE_TERMS} Glieder, Σ a(k)·zᵏ, gegen den Bruch P(z)/Q(z) an z = t/λ₁ (bei Klasse polynomiell oder endlich: z = t). "
-           "Bei t < 1 stimmen beide überein, bei t ≥ 1 liegt z an oder hinter der kleinsten Nullstelle von Q und die Reihe konvergiert nicht.")
+           "Bei exponentiellem oder polynomiellem Wachstum stimmen beide bei t < 1 überein, bei t ≥ 1 liegt z an oder hinter der kleinsten Nullstelle von Q und die Reihe konvergiert nicht; "
+           "bei einem Polynom (endliche Folge) stimmen beide für jedes t überein.")
 t = st.slider("t (Anteil des Konvergenzradius)", 0.1, 1.5, 0.5, 0.05, key="probe_t")
 verdict(verdict_probe(probe(a, float(t))))
 
@@ -256,10 +257,10 @@ st.markdown(
     f"""
 | Annahme | Was passiert, wenn sie verletzt ist | Wer setzt an |
 |---|---|---|
-| **Nur Regeln mit endlichem Automaten** | Die erzeugende Funktion ist nur dann ein Bruch aus Polynomen, wenn der Zustand klein und endlich bleibt. Bei Strukturen mit Verschachtelung (Klammern, Bäume) ist sie es nicht (Catalan-Zahlen). | Stück 3 der Reihe: symbolische Methode |
-| **Wachstum nur aus dem größten Eigenwert** | Bei mehreren Eigenwerten mit gleichem Betrag schwingt der Quotient, bei mehrfachen kommt ein polynomieller Faktor dazu; diese Demo liest nur die Klasse, nicht den Grad. | Stück 9 der Reihe: Asymptotik |
-| **Nullstellen sind Näherungen** | Durand–Kerner liefert Näherungen; die App warnt, wenn der Rest über {C.RESIDUAL_WARN:.0e} liegt. Mehrfachnullstellen konvergieren langsamer. | – |
-| **Einschwingtempo nur als Faustregel** | ln(ε)/ln(Verhältnis der Eigenwerte) lässt die Konstante vor dem Abklingen weg und kann um ein Drittel danebenliegen. | – |
+| **Regeln mit endlichem Automaten** | Die hier benutzte Matrixmethode setzt einen endlichen Automaten voraus. Bei Strukturen mit Verschachtelung (Klammern, Bäume) ist sie es nicht (Catalan-Zahlen). | Stück 3 der Reihe: symbolische Methode |
+| **Wachstum nur aus dem größten Eigenwert** | Bei mehreren Eigenwerten mit gleichem Betrag kann der Quotient schwingen, bei mehrfachen kommt ein polynomieller Faktor dazu; diese Demo liest nur die Klasse, nicht den Grad. | Stück 9 der Reihe: Asymptotik |
+| **Nullstellen sind Näherungen** | Durand–Kerner liefert Näherungen; die App warnt, wenn der Rest über {C.RESIDUAL_WARN:.0e} liegt. Mehrfachnullstellen konvergieren langsamer oder gar nicht: Bei der dreifachen Nullstelle λ = 1 (Q = (1 − z)³) scheitert das Verfahren; die App warnt dann, zeigt aber trotzdem eine falsche Klasse „exponentiell“ und eine falsche Stellenzahl (bekannte Lücke, nicht behoben). | – |
+| **Einschwingtempo nur als Faustregel** | ln(ε)/ln(Verhältnis der Eigenwerte) lässt die Konstante vor dem Abklingen weg und kann um die Hälfte danebenliegen. | – |
 | **Wachstumsklassen aus einer Schwelle** | Polynomiell und exponentiell trennt die Steigung von ln a(n) bei {C.CLASS_SLOPE}; das gilt für diese kleinen Automaten, nicht allgemein. | – |
 | **Schichtfolgen sind nur der Rahmen** | Echte Dienstplanung ist ein Optimierungsproblem; hier wird nur gezählt. | – |
 """
@@ -284,7 +285,7 @@ with st.expander("📐 Mathematische Formulierung"):
 
 **Literatur** (Titel und Fundstelle aus dem Gedächtnis, nicht eingesehen).
 R. P. Stanley: *Enumerative Combinatorics, Volume 1*, 2. Auflage, Cambridge University Press 2012, Kapitel 4 (rationale erzeugende Funktionen und lineare Rekursionen mit konstanten Koeffizienten).
-P. Flajolet und R. Sedgewick: *Analytic Combinatorics*, Cambridge University Press 2009, Kapitel I und IV (symbolische Methode, Singularitätsanalyse, rationale Funktionen).
+P. Flajolet und R. Sedgewick: *Analytic Combinatorics*, Cambridge University Press 2009, Kapitel I (symbolische Methode), IV (rationale Funktionen) und VI (Singularitätsanalyse).
         """
     )
 

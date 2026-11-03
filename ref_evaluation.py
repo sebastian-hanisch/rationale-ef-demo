@@ -40,7 +40,7 @@ def analyse(settings: Settings) -> Analysis:
     problems = A.check_rational(auto, rat)
     res = A.residual(rat.qr, growth.roots)
     if res > C.RESIDUAL_WARN:
-        problems.append(f"Die Eigenwerte sind ungenau (Rest {res:.1e}); Bild und Wachstumsangaben mit Vorsicht lesen")
+        problems.append(f"Die Eigenwerte sind ungenau (Rest {res:.1e}); Bild und Wachstumsangaben mit Vorsicht lesen; bei mehrfachen Nullstellen können Klasse, Kennzahl und Stellenzahl falsch sein")
     return Analysis(settings, rules, parse_problems, auto, rat, growth, seq, problems)
 
 
@@ -181,7 +181,7 @@ def verdict_growth(res: dict) -> tuple[str, str]:
     return "success", text
 
 
-# ----------------------------------------------------------------------------- Experiment 4: Stellenzahl ohne Zählen
+# ----------------------------------------------------------------------------- Experiment 4: Stellenzahl vorhersagen
 
 def digits_experiment(auto: A.Automaton, rat: A.Rational, sizes=C.DIGIT_SIZES) -> dict:
     """Stellenzahl von a(n) aus λ₁ und c vorhergesagt gegen die gezählte (nur bei exponentiellem Wachstum)."""
